@@ -2,8 +2,8 @@
 To create the Redcap initial database:
 
 CREATE DATABASE IF NOT EXISTS redcap_psychology;
-CREATE USER 'redcap_psychology'@'20.73.37.53' IDENTIFIED BY 'see vault';
-GRANT CREATE, SELECT, INSERT, UPDATE, DELETE ON redcap_psychology.* TO 'redcap_psychology'@'20.73.37.53';
+CREATE USER 'redcap_psychology'@'x.x.x.x' IDENTIFIED BY 'see vault';
+GRANT CREATE, SELECT, INSERT, UPDATE, DELETE ON redcap.* TO 'redcap'@'x.x.x.x';
 
 -- Example for creating the database (in either MariaDB or MySQL)
 CREATE DATABASE IF NOT EXISTS `redcap`;
