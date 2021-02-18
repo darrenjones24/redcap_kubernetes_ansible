@@ -34,16 +34,18 @@ undo deployment
 
 Requirements
 ------------
-
+```
 Azure Storage Account
 Azure MYSQL Database
 Kubernetes Cluster
 Container Registry
 Redcap Container
+```
 
 Role Variables
 --------------
 
+```
 name_of_host
 tls_server
 tls_server_path
@@ -58,13 +60,17 @@ servicename_port
 servicename_gateway
 service_url1
 service_url2
+```
 
 ### stored in ansible vault redcap_db_credentials
+
+```
 redcap_db_host
 redcap_db_name
 redcap_db_username
 redcap_db_password
 redcap_salt
+```
 
 
 Dependencies
