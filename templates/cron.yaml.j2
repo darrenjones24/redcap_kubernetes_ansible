@@ -1,0 +1,21 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ service_name }}-cron
+  namespace: {{ service_namespace }}
+  annotations:
+    sidecar.istio.io/inject: "false"
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        spec:
+          containers:
+          - name: curl 
+            image: curlimages/curl
+            args: ["http://{{ servicename_service }}.{{ service_namespace }}.svc.cluster.local/cron.php"]
+          restartPolicy: Never

@@ -1,0 +1,23 @@
+---
+# A persistentVolume, using the secret created above, mapping an existing azure files share
+# The pv is not namespace bound. 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ pv_name }} 
+  labels:
+    # create a label here so pvc can be matched using a label
+    usage: {{ pv_name }}
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  azureFile:
+    # use the secret defined before
+    secretName: azure-files-secret
+    secretNamespace: {{ service_namespace }} 
+    # the sharename
+    shareName: {{ azure_share_name }}
+    readOnly: false

@@ -1,0 +1,37 @@
+---
+# this is an istio resource that sets up a gateway, ie a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections
+# See https://istio.io/latest/docs/reference/config/networking/gateway/
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  namespace: {{ service_namespace }}
+  name: {{ servicename_gateway }}
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    # this is a list of hosts which we are expecting HTTP traffic such as desinc1.desinc.com
+    - {{ service_url1 }} 
+    - {{ service_url2 }} 
+    tls:
+      # always redirect
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      # credentialname is a secret containing certs and key that has been uploaded already
+      credentialName: {{ service_name }}-tls 
+      minProtocolVersion: TLSV1_2
+      maxProtocolVersion: TLSV1_3
+    hosts:
+    # this is a list of hosts which we are expecting HTTPS traffic such as desinc1.desinc.com
+    - {{ service_url1 }} 
+    - {{ service_url2 }} 

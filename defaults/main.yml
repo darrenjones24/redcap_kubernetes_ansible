@@ -1,0 +1,3 @@
+---
+# defaults file for uos.k8s_redcap
+kubectl_path: /usr/local/bin/kubectl

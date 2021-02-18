@@ -1,0 +1,72 @@
+---
+# tasks file for uos.k8s_redcap
+
+# Get the TLS certificates from pigman - set vars.
+- name: Fetch an ssh key from "{{ tls_server}}"
+  slurp:
+    src: "{{ tls_server_path }}/{{ name_of_host}}.key"
+  register: sshkey
+  become: true
+  vars:
+    connection: ssh
+  remote_user: configuration_manager
+  delegate_to: "{{ tls_server }}"
+  delegate_facts: True
+- name: Fetch an ssh crt from "{{ tls_server }}"
+  slurp:
+    src: "{{ tls_server_path }}/{{ name_of_host}}.crt"
+  register: sshcrt
+  become: yes
+  remote_user: configuration_manager
+  delegate_to: "{{ tls_server }}"
+  delegate_facts: True
+
+- name: Fetch the intermediate certificate from "{{ tls_server}}"
+  slurp:
+    src: "{{ tls_intermediate_certificate }}"
+  register: sshintermediate
+  become: yes
+  remote_user: configuration_manager
+  delegate_to: "{{ tls_server}}"
+  delegate_facts: True
+
+- name: concatenate text certificates so that the intermediate follows the crt TAKE CARE WITH WHITESPACE HERE
+  set_fact:
+    txtsshcrtintermediate: "{{ sshcrt['content'] |  b64decode }}{{ sshintermediate['content'] |  b64decode }}"
+
+- name: Render deployment template
+  set_fact:
+    "{{ item }}": "{{ lookup('template', item + '.yaml.j2') }}"
+  with_items:
+    - 'namespace'
+    - 'database_secret'
+    - 'msmtp_secret'
+    - 'tls'
+    - 'azure_file_secret'
+    - 'pv'
+    - 'pvc'
+    - 'service'
+    - 'gateway'
+    - 'virtualservice'
+    - 'deployment'
+    - 'autoscaler'
+    - 'cron'
+
+- name: Deploy 
+  shell: |
+    echo {{ item | quote }} | {{ kubectl_path }} apply -f -
+  with_items:
+    - "{{ namespace }}"
+    - "{{ database_secret }}"
+    - "{{ msmtp_secret }}"
+    - "{{ tls }}"
+    - "{{ azure_file_secret }}"
+    - "{{ pv }}"
+    - "{{ pvc }}"
+    - "{{ service }}"
+    - "{{ gateway }}"
+    - "{{ virtualservice }}"
+    - "{{ deployment }}"
+    - "{{ autoscaler }}"
+    - "{{ cron }}"
+

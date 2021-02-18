@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+data:
+  tls.crt: "{{ txtsshcrtintermediate | b64encode  }}"
+  tls.key: "{{  sshkey['content'] }}"
+kind: Secret
+metadata:
+  creationTimestamp: null
+  # this is the secret that hold the tls keys. NOTE it is is held in the istio-system namespace!
+  # kubectl create secret tls my-tls-secret  --cert=path/to/cert/file  --key=path/to/key/file --dry-run=client -o yaml
+  # as with nginx, concatenate certificates to form a bundle crt: 'cat your_domain.crt intermediate.crt root.crt >> ssl-bundle.crt'
+  name: {{ service_name }}-tls
+  namespace: istio-system
+type: kubernetes.io/tls

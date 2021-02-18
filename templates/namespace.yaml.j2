@@ -1,0 +1,11 @@
+---
+# Create a namespace
+# kubectl create  namespace example --dry-run=client -o yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: {{ service_namespace }}
+  labels:
+    istio-injection: enabled
+    environment: production

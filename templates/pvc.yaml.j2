@@ -1,0 +1,23 @@
+---
+# a PVC for the persistent volume above
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: fileshare
+  namespace: {{ service_namespace }} 
+  # Set this annotation to NOT let Kubernetes automatically create
+  # a persistent volume for this volume claim.
+  annotations:
+    volume.beta.kubernetes.io/storage-class: ""
+spec:
+  accessModes:
+    - ReadWriteMany
+  # we could deine our own storageclass, but lets use the builtin
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+     # To make sure we match the claim with the exact volume, match the label
+    matchLabels:
+      usage: {{  pv_name }}
+  # we could add mount options here

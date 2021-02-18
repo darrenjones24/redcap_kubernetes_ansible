@@ -1,0 +1,19 @@
+---
+# the service to expose the web server 
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ service_namespace }}
+  name: {{ servicename_service }}
+  labels:
+    app: {{ service_name }} 
+spec:
+  ports:
+  # the container only runs as an http server, the nginx image runs on port 80, if we change the port on the image we would change the port here
+  - name: http
+    # service listens on prt 80
+    port: 80
+    # service forwards to port 80
+    targetPort: 8080
+  selector:
+    app: {{ service_name }}

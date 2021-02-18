@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ service_name }}
+  name: {{ service_name }}
+  namespace: {{ service_namespace }}
+spec:
+  # start with this number of pods
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ service_name }}
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ service_name }}
+    spec:
+      securityContext:
+        fsGroup: 33
+      containers:
+      - name: {{ service_name }}
+        # specify the exact image name, using 'latest' can cause downtime if the repo is offline
+        image: {{ image_name }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: {{ servicename_port }}
+          containerPort: 8080
+        livenessProbe:
+          # just looks for a 200 response. basic. 
+          httpGet:
+            path: /
+            port: {{ servicename_port }}
+          initialDelaySeconds: 120
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 3
+        resources:
+          # resources MUST be set, it defeats the point of doing it if resorices are not defined. 
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        # mount the volume at the location below
+        volumeMounts:
+          - name: azurefileshare
+            mountPath: /var/www/edocs/
+          - name: msmtp-secrets
+            mountPath: /etc/msmtprc
+            subPath: msmtprc
+          - name: database-secrets
+            mountPath: /etc/ssl/certs/DigiCertGlobalRootCA.crt.pem
+            subPath: DigiCertGlobalRootCA.crt.pem
+          - name: database-secrets
+            mountPath: /dbconnect.php
+            subPath: dbconnect.php 
+      volumes:
+        - name: database-secrets
+          secret:
+            secretName: database-secrets
+        - name: msmtp-secrets
+          secret:
+            secretName: msmtp-secrets
+        # this is the azure file share we defined the pv and pvc for earlier
+        - name: azurefileshare
+          persistentVolumeClaim:
+            claimName: fileshare
+      priorityClassName: department-services

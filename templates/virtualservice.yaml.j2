@@ -1,0 +1,27 @@
+---
+#A VirtualService defines a set of traffic routing rules to apply when a host is addressed. Each routing rule defines matching criteria for traffic of a specific protocol.
+# https://istio.io/latest/docs/reference/config/networking/virtual-service/
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  namespace: {{ service_namespace }}
+  name: {{ service_name }}
+spec:
+  hosts:
+    # this is a list of hosts which we are expecting traffic such as desinc1.desinc.com
+  - {{ service_url1 }} 
+  - {{ service_url2 }} 
+  gateways:
+  - {{ servicename_gateway }}
+  http:
+  # we can match explicit URLs and send them to particular container services
+  #- match:
+    #- uri:
+       # exact: /
+  - route:
+    - destination:
+        # this is the service that the virtualservice is sending to 
+        host: {{ servicename_service }}
+        port:
+          # here the service listens on 80
+          number: 80
